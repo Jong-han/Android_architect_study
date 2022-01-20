@@ -1,4 +1,4 @@
-package com.jh.navermovie
+package com.jh.navermovie.ui.main.search
 
 import com.jh.navermovie.api.Movie
 import com.jh.navermovie.api.MovieDataSource
@@ -8,13 +8,13 @@ import com.jh.navermovie.db.ReviewEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SearchPresenterImpl: Contract.SearchPresenter {
+class SearchPresenterImpl: SearchContract.SearchPresenter {
 
     private var dataSource: MovieDataSource? = null
     private var db: MovieDB? = null
-    private var view: Contract.View? = null
+    private var view: SearchContract.View? = null
 
-    override fun initPresenter(view: Contract.View, dataSource: MovieDataSource, db: MovieDB) {
+    override fun initPresenter(view: SearchContract.View, dataSource: MovieDataSource, db: MovieDB) {
         this.dataSource = dataSource
         this.view = view
         this.db = db
@@ -24,11 +24,11 @@ class SearchPresenterImpl: Contract.SearchPresenter {
         return dataSource?.getMovies(searchString)
     }
 
-    private suspend fun getReview(movie: Movie): ReviewEntity? {
+    private fun getReview(movie: Movie): ReviewEntity? {
         return movie.title?.let { db?.reviewDAO()?.getRate(it) }
     }
 
-    private suspend fun insertReview(reviewEntity: ReviewEntity) {
+    private fun insertReview(reviewEntity: ReviewEntity) {
         db?.reviewDAO()?.insert(reviewEntity)
     }
 
@@ -49,7 +49,11 @@ class SearchPresenterImpl: Contract.SearchPresenter {
         withContext(Dispatchers.IO) {
             review = getReview(movie)
         }
-        view?.showReviewDialog(movie, review)
+        view?.showReviewDialog(movie, review) { reviewEntity: ReviewEntity ->
+            withContext(Dispatchers.IO) {
+                insertReview(reviewEntity)
+            }
+        }
     }
 
 }

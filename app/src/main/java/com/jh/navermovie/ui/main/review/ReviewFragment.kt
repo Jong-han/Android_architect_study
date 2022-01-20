@@ -8,18 +8,18 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.jh.navermovie.App
 import com.jh.navermovie.R
 import com.jh.navermovie.databinding.FragmentReviewBinding
 import com.jh.navermovie.db.MovieDB
-import kotlinx.coroutines.Dispatchers
+import com.jh.navermovie.db.ReviewEntity
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class ReviewFragment : Fragment() {
+class ReviewFragment : Fragment(), ReviewContract.View {
 
     private lateinit var dataBinding: FragmentReviewBinding
     private val adapter by lazy { ReviewAdapter() }
-    private val db by lazy { Room.databaseBuilder(requireContext(), MovieDB::class.java, "MovieDB.db").build() }
+    private val reviewPresenter by lazy { ReviewPresenterImpl() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +33,7 @@ class ReviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        reviewPresenter.initPresenter(this, App.db)
         dataBinding.rvReview.adapter = this.adapter
 
     }
@@ -40,11 +41,12 @@ class ReviewFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
-            val reviewList = withContext(Dispatchers.IO) {
-                db.reviewDAO().getAll()
-            }
-            adapter.submitList(reviewList)
+            reviewPresenter.onResumeReview()
         }
+    }
+
+    override fun submitReviewList(list: List<ReviewEntity>) {
+        adapter.submitList(list)
     }
 
 }
