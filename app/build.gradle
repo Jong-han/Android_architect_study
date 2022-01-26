@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -64,5 +65,8 @@ dependencies {
     // okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
+    //hilt
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
 
 }
