@@ -10,8 +10,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import com.jh.navermovie.R
+import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.databinding.DialogReviewBinding
-import com.jh.navermovie.db.ReviewEntity
 
 class ReviewDialog: DialogFragment() {
 
@@ -25,7 +25,7 @@ class ReviewDialog: DialogFragment() {
         private const val REVIEW_STRING = "REVIEW_STRING"
         private const val REVIEW_REQUEST_KEY = "REVIEW_REQUEST_KEY"
 
-        fun displayReviewDialog( fragmentManager: FragmentManager, lifecycleOwner: LifecycleOwner, title: String, url: String?, review: ReviewEntity?, saveReview: (ReviewEntity)->Unit) {
+        fun displayReviewDialog(fragmentManager: FragmentManager, lifecycleOwner: LifecycleOwner, title: String, url: String?, review: ReviewEntity?, saveReview: (ReviewEntity)->Unit) {
 
             ReviewDialog().run {
                 fragmentManager.setFragmentResultListener(REVIEW_REQUEST_KEY, lifecycleOwner) { requestKey, result ->

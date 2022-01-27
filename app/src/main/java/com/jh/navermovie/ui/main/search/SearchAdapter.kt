@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.jh.navermovie.R
-import com.jh.navermovie.api.Movie
+import com.jh.navermovie.data.remote.response.Movie
 import com.jh.navermovie.databinding.FragmentSearchItemBinding
 
 class SearchAdapter(private val onClickMovie: (Int)->Unit, private val onClickDetail: (String)->Unit): ListAdapter<Movie, SearchAdapter.SearchViewHolder>( SearchDiffUtil() ) {
@@ -23,7 +23,7 @@ class SearchAdapter(private val onClickMovie: (Int)->Unit, private val onClickDe
     }
 
     inner class SearchViewHolder( private val binding: FragmentSearchItemBinding ): RecyclerView.ViewHolder( binding.root ) {
-        fun bind( item: Movie ) {
+        fun bind( item: Movie) {
             binding.run {
                 data = item.also {
                     it.title = it.title?.replace("<b>","")

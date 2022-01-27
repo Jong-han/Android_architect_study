@@ -1,4 +1,4 @@
-package com.jh.navermovie.db
+package com.jh.navermovie.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

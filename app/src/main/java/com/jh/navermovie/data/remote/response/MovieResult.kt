@@ -1,4 +1,4 @@
-package com.jh.navermovie.api
+package com.jh.navermovie.data.remote.response
 
 data class MovieResult(
     var items: ArrayList<Movie>? = null

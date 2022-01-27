@@ -1,7 +1,7 @@
 package com.jh.navermovie.ui.main.review
 
-import com.jh.navermovie.db.MovieDB
-import com.jh.navermovie.db.ReviewEntity
+import com.jh.navermovie.data.local.db.MovieDB
+import com.jh.navermovie.data.local.db.ReviewEntity
 
 interface ReviewContract {
     interface ReviewPresenter {

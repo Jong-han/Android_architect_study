@@ -3,30 +3,33 @@ package com.jh.navermovie.ui.main.search
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.jh.navermovie.App
 import com.jh.navermovie.R
-import com.jh.navermovie.api.Movie
-import com.jh.navermovie.api.MovieDataSource
+import com.jh.navermovie.data.Resource
+import com.jh.navermovie.data.local.db.ReviewEntity
+import com.jh.navermovie.data.remote.response.Movie
 import com.jh.navermovie.databinding.FragmentSearchBinding
-import com.jh.navermovie.db.ReviewEntity
 import com.jh.navermovie.ui.dialog.ReviewDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SearchFragment : Fragment(), SearchContract.View {
+@AndroidEntryPoint
+class SearchFragment : Fragment() {
 
     private lateinit var dataBinding: FragmentSearchBinding
-    private val movieDataSource by lazy { MovieDataSource() }
+    private val viewModel: SearchViewModel by viewModels()
     private val adapter by lazy { SearchAdapter(onClickMovie, onClickDetail) }
-    private val searchPresenter: SearchContract.SearchPresenter by lazy { SearchPresenterImpl() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,19 +37,31 @@ class SearchFragment : Fragment(), SearchContract.View {
     ): View {
         dataBinding = DataBindingUtil.inflate(layoutInflater, R.layout.fragment_search, container, false)
         dataBinding.lifecycleOwner = this
+        dataBinding.viewModel = viewModel
         return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchPresenter.initPresenter(this, movieDataSource, App.db)
-
         dataBinding.rvSearch.adapter = this.adapter
 
         dataBinding.btnSearch.setOnClickListener {
             lifecycleScope.launch {
-                searchPresenter.onClickSearch(dataBinding.etSearch.text.toString())
+                viewModel.getFilteredMovies().collect {
+                    when (it) {
+                        is Resource.Loading -> { Toast.makeText(requireContext(), "영화 정보를 가져옵니다", Toast.LENGTH_SHORT).show() }
+                        is Resource.Success -> {
+                            val movieList = it.data?.items?.toList()
+                            adapter.submitList(movieList)
+                            controlVisibility(movieList.isNullOrEmpty())
+                        }
+                        is Resource.Error -> {
+                            Toast.makeText(requireContext(), "영화 정보 가져오는데 실패했어요", Toast.LENGTH_SHORT).show()
+                            Log.i("asdf","fail cause :: ${it.errorMsg}")
+                        }
+                    }
+                }
             }
         }
 
@@ -55,7 +70,6 @@ class SearchFragment : Fragment(), SearchContract.View {
     private val onClickMovie: Function1<Int,Unit> = { pos: Int ->
         val movie = adapter.currentList[pos]
         lifecycleScope.launch {
-            searchPresenter.onClickMovie(movie)
         }
     }
 
@@ -63,11 +77,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
     }
 
-    override fun submitSearchList(list: List<Movie>) {
-        adapter.submitList( list )
-    }
-
-    override fun controlVisibility(isEmpty: Boolean) {
+    private fun controlVisibility(isEmpty: Boolean) {
         if (!isEmpty) {
             dataBinding.rvSearch.visibility = View.VISIBLE
             dataBinding.tvEmpty.visibility = View.INVISIBLE
@@ -77,7 +87,7 @@ class SearchFragment : Fragment(), SearchContract.View {
         }
     }
 
-    override fun showReviewDialog(movie: Movie, review: ReviewEntity?, insertReview: suspend (ReviewEntity)->Unit) {
+    fun showReviewDialog(movie: Movie, review: ReviewEntity?, insertReview: suspend (ReviewEntity)->Unit) {
         ReviewDialog.displayReviewDialog(parentFragmentManager, this@SearchFragment, movie.title ?: "Review", movie.image, review ) { reviewEntity: ReviewEntity ->
             lifecycleScope.launch(Dispatchers.IO) {
                 insertReview.invoke(reviewEntity)

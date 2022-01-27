@@ -1,4 +1,4 @@
-package com.jh.navermovie.db
+package com.jh.navermovie.data.local.db
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -12,7 +12,7 @@ interface ReviewDAO {
     fun getAll(): List<ReviewEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert( reviewEntity: ReviewEntity )
+    fun insert( reviewEntity: ReviewEntity)
 
     @Query("SELECT * FROM Review WHERE title = :title")
     fun getRate(title: String): ReviewEntity?

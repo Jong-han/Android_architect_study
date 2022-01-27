@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.jh.navermovie.R
+import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.databinding.FragmentReviewItemBinding
-import com.jh.navermovie.db.ReviewEntity
 
 class ReviewAdapter: ListAdapter<ReviewEntity, ReviewAdapter.ReviewViewHolder>( ReviewDiffUtil() ) {
 

@@ -1,14 +1,14 @@
 package com.jh.navermovie.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.jh.navermovie.R
 import com.jh.navermovie.databinding.ActivityMainBinding
-import kotlin.math.tan
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var dataBinding: ActivityMainBinding

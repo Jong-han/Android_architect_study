@@ -5,7 +5,7 @@
     <data>
         <variable
             name="data"
-            type="com.jh.navermovie.db.ReviewEntity" />
+            type="com.jh.navermovie.data.local.db.ReviewEntity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

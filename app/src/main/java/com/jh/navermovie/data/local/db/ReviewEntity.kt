@@ -1,4 +1,4 @@
-package com.jh.navermovie.db
+package com.jh.navermovie.data.local.db
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

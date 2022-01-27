@@ -7,12 +7,10 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Room
 import com.jh.navermovie.App
 import com.jh.navermovie.R
+import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.databinding.FragmentReviewBinding
-import com.jh.navermovie.db.MovieDB
-import com.jh.navermovie.db.ReviewEntity
 import kotlinx.coroutines.launch
 
 class ReviewFragment : Fragment(), ReviewContract.View {

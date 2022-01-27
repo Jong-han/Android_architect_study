@@ -2,7 +2,7 @@ package com.jh.navermovie
 
 import android.app.Application
 import androidx.room.Room
-import com.jh.navermovie.db.MovieDB
+import com.jh.navermovie.data.local.db.MovieDB
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
