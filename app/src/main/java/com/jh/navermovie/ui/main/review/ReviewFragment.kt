@@ -38,7 +38,8 @@ class ReviewFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.getReviewList().collect {
-                adapter.submitList(it)
+                adapter.submitList(it.reversed())
+                dataBinding.rvReview.scrollToPosition(0)
             }
         }
     }

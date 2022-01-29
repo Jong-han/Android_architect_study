@@ -57,6 +57,7 @@
             android:textSize="100dp"
             android:textColor="@color/purple_700"
             android:textStyle="bold"
+            android:visibility="visible"
             app:layout_constraintTop_toBottomOf="@id/et_search"
             app:layout_constraintStart_toStartOf="@id/rv_search"
             app:layout_constraintEnd_toEndOf="@id/rv_search"

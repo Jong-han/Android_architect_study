@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.jh.navermovie.R
-import com.jh.navermovie.data.Resource
 import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.data.remote.response.Movie
 import com.jh.navermovie.databinding.FragmentSearchBinding
@@ -45,23 +44,27 @@ class SearchFragment : Fragment() {
 
         dataBinding.rvSearch.adapter = this.adapter
 
-        dataBinding.btnSearch.setOnClickListener {
-            lifecycleScope.launch {
-                viewModel.getFilteredMovies().collect {
-                    when (it) {
-                        is Resource.Loading -> { Toast.makeText(requireContext(), "영화 정보를 가져옵니다", Toast.LENGTH_SHORT).show() }
-                        is Resource.Success -> {
-                            Toast.makeText(requireContext(), "영화 정보 가져오는데 성공했어요", Toast.LENGTH_SHORT).show()
-                            val movieList = it.data?.items?.toList()
-                            adapter.submitList(movieList)
-                            controlVisibility(movieList.isNullOrEmpty())
-                        }
-                        is Resource.Error -> {
-                            Toast.makeText(requireContext(), "영화 정보 가져오는데 실패했어요", Toast.LENGTH_SHORT).show()
-                        }
+        lifecycleScope.launch {
+            viewModel.movieList.collect {
+                adapter.submitList(it)
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.event.collect {
+                when (it) {
+                    is SearchViewModel.Event.ShowToast -> {
+                        Toast.makeText(requireContext(), it.string, Toast.LENGTH_SHORT).show()
+                    }
+                    is SearchViewModel.Event.SetVisibility -> {
+                        controlVisibility(it.isEmpty)
                     }
                 }
             }
+        }
+
+        dataBinding.btnSearch.setOnClickListener {
+            viewModel.getFilteredMovies()
         }
 
     }
@@ -76,7 +79,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private val onClickDetail: Function1<String,Unit> = { link: String ->
+    private val onClickDetail: (String)->Unit = { link: String ->
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
     }
 
