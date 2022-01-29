@@ -3,7 +3,6 @@ package com.jh.navermovie.ui.main.search
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,13 +51,13 @@ class SearchFragment : Fragment() {
                     when (it) {
                         is Resource.Loading -> { Toast.makeText(requireContext(), "영화 정보를 가져옵니다", Toast.LENGTH_SHORT).show() }
                         is Resource.Success -> {
+                            Toast.makeText(requireContext(), "영화 정보 가져오는데 성공했어요", Toast.LENGTH_SHORT).show()
                             val movieList = it.data?.items?.toList()
                             adapter.submitList(movieList)
                             controlVisibility(movieList.isNullOrEmpty())
                         }
                         is Resource.Error -> {
                             Toast.makeText(requireContext(), "영화 정보 가져오는데 실패했어요", Toast.LENGTH_SHORT).show()
-                            Log.i("asdf","fail cause :: ${it.errorMsg}")
                         }
                     }
                 }
@@ -67,9 +66,13 @@ class SearchFragment : Fragment() {
 
     }
 
-    private val onClickMovie: Function1<Int,Unit> = { pos: Int ->
+    private val onClickMovie: (Int)->Unit = { pos: Int ->
         val movie = adapter.currentList[pos]
         lifecycleScope.launch {
+            val review = withContext(Dispatchers.IO) {
+                viewModel.getReview(movie.title ?: "")
+            }
+            showReviewDialog(movie, review) { reviewEntity ->  viewModel.insertReview(reviewEntity) }
         }
     }
 
@@ -87,7 +90,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    fun showReviewDialog(movie: Movie, review: ReviewEntity?, insertReview: suspend (ReviewEntity)->Unit) {
+    private fun showReviewDialog(movie: Movie, review: ReviewEntity?, insertReview: suspend (ReviewEntity)->Unit) {
         ReviewDialog.displayReviewDialog(parentFragmentManager, this@SearchFragment, movie.title ?: "Review", movie.image, review ) { reviewEntity: ReviewEntity ->
             lifecycleScope.launch(Dispatchers.IO) {
                 insertReview.invoke(reviewEntity)

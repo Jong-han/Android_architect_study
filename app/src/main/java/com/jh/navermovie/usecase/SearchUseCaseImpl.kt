@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class MovieUseCaseImpl @Inject constructor(private val remoteRepository: RemoteRepository): MovieUseCase {
+class SearchUseCaseImpl @Inject constructor(private val remoteRepository: RemoteRepository): SearchUseCase {
     override fun getFilteredMovies(searchString: String): Flow<Resource<MovieResult>> {
         return remoteRepository.getMovies(searchString).map {
             when (it) {

@@ -6,18 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.jh.navermovie.App
 import com.jh.navermovie.R
-import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.databinding.FragmentReviewBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class ReviewFragment : Fragment(), ReviewContract.View {
+@AndroidEntryPoint
+class ReviewFragment : Fragment() {
 
     private lateinit var dataBinding: FragmentReviewBinding
+    private val viewModel: ReviewViewModel by viewModels()
     private val adapter by lazy { ReviewAdapter() }
-    private val reviewPresenter by lazy { ReviewPresenterImpl() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,26 +27,19 @@ class ReviewFragment : Fragment(), ReviewContract.View {
     ): View {
         dataBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_review, container, false)
         dataBinding.lifecycleOwner = this
+        dataBinding.viewModel = viewModel
         return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        reviewPresenter.initPresenter(this, App.db)
         dataBinding.rvReview.adapter = this.adapter
 
-    }
-
-    override fun onResume() {
-        super.onResume()
         lifecycleScope.launch {
-            reviewPresenter.onResumeReview()
+            viewModel.getReviewList().collect {
+                adapter.submitList(it)
+            }
         }
     }
-
-    override fun submitReviewList(list: List<ReviewEntity>) {
-        adapter.submitList(list)
-    }
-
 }
