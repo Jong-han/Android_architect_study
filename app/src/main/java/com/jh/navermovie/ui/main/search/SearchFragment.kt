@@ -15,6 +15,7 @@ import com.jh.navermovie.R
 import com.jh.navermovie.data.local.db.ReviewEntity
 import com.jh.navermovie.data.remote.response.Movie
 import com.jh.navermovie.databinding.FragmentSearchBinding
+import com.jh.navermovie.ext.repeatOnStarted
 import com.jh.navermovie.ui.dialog.ReviewDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -44,13 +45,13 @@ class SearchFragment : Fragment() {
 
         dataBinding.rvSearch.adapter = this.adapter
 
-        lifecycleScope.launch {
+        repeatOnStarted {
             viewModel.movieList.collect {
                 adapter.submitList(it)
             }
         }
 
-        lifecycleScope.launch {
+        repeatOnStarted {
             viewModel.event.collect {
                 when (it) {
                     is SearchViewModel.Event.ShowToast -> {
