@@ -7,12 +7,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.jh.navermovie.R
 import com.jh.navermovie.databinding.FragmentReviewBinding
+import com.jh.navermovie.ext.repeatOnStarted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ReviewFragment : Fragment() {
@@ -36,11 +35,12 @@ class ReviewFragment : Fragment() {
 
         dataBinding.rvReview.adapter = this.adapter
 
-        lifecycleScope.launch {
+        repeatOnStarted {
             viewModel.getReviewList().collect {
                 adapter.submitList(it.reversed())
                 dataBinding.rvReview.scrollToPosition(0)
             }
         }
+
     }
 }
